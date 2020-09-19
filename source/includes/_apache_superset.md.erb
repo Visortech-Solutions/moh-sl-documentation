@@ -1,0 +1,109 @@
+# Apache Superset
+
+Apache Superset (incubating) is a modern, enterprise-ready business intelligence web application
+
+<aside class="notice">
+Disclaimer: Apache Superset is an effort undergoing incubation at The Apache Software Foundation (ASF), sponsored by the Apache Incubator. Incubation is required of all newly accepted projects until a further review indicates that the infrastructure, communications, and decision making process have stabilized in a manner consistent with other successful ASF projects. While incubation status is not necessarily a reflection of the completeness or stability of the code, it does indicate that the project has yet to be fully endorsed by the ASF.
+</aside>
+
+## What is Apache Superset ?
+
+### Features
+
+1. A rich set of data visualizations
+2. An easy-to-use interface for exploring and visualizing data
+3. Create and share dashboards
+4. Enterprise-ready authentication with integration with major authentication providers (`database`, `OpenID`, `LDAP`, `OAuth & REMOTE_USER through Flask AppBuilder`)
+5. An extensible, high-granularity security/permission model allowing intricate rules on who can access individual features and the dataset
+6. A simple semantic layer, allowing users to control how data sources are displayed in the UI by defining which fields should show up in which drop-down and which aggregation and function metrics are made available to the user
+7. Integration with most SQL-speaking RDBMS through SQLAlchemy
+8. Deep integration with `Druid.io`
+
+### Databases Supported
+
+The following RDBMS are currently supported:
+
+1. Amazon Athena
+2. Amazon Redshift
+3. Apache Drill
+4. Apache Druid
+5. Apache Hive
+6. Apache Impala
+7. Apache Kylin
+8. Apache Pinot
+9. Apache Spark SQL
+10. BigQuery
+11. ClickHouse
+12. CockroachDB
+13. Dremio
+14. Elasticsearch
+15. Exasol
+16. Google Sheets
+17. Greenplum
+18. IBM Db2
+19. MySQL
+20. Oracle
+21. PostgreSQL
+22. Presto
+23. Snowflake
+24. SQLite
+25. SQL Server
+26. Teradata
+27. Vertica
+28. Hana
+
+Other database engines with a proper DB-API driver and SQLAlchemy dialect should be supported as well.
+
+<%= image_tag "images/apache-superset.png" %>
+
+## Visortech Docker Setup
+
+Due to code modifications done on [Apache Superset codebase](https://github.com/apache/incubator-superset) we had to perform a custom installation process. This enables us to test changes done on the codebase at almost realtime.
+
+### Installation modifications done on Apache Superset
+
+We added the following files in order to enable a custom setup:
+
+1. **Dockerfile-visortech**: This is a custom docker image setup for visortech
+2. **docker-compose.visortech.yml**: A sample docker-compose config file to show how to setup using docker-compose
+
+### Getting Started
+
+1. Download the codebase using `git clone`.
+2. Create a docker-compose configuration file
+3. Running Apache Superset
+
+```yaml
+version: '3.7'
+
+services:
+
+  superset_new:
+    container_name: visortech_superset_0.37.2
+    restart: unless-stopped
+    image: visortech_superset_0.37.2-chelule:latest
+    ports:
+      - 8808:8088
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://superset:superset@postgres:5432/superset
+      - DATABASE_DB=superset
+      - DATABASE_HOST=db
+      - DATABASE_PASSWORD=superset
+      - DATABASE_USER=superset
+      - DATABASE_PORT=5432
+      - DATABASE_DIALECT=postgresql
+      - PYTHONPATH=/app/pythonpath:/app/pythonpath_docker
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - FLASK_ENV=production
+      - SUPERSET_ENV=production
+      - SUPERSET_LOAD_EXAMPLES=no
+```
+```shell
+xxxxxxx@ubuntu-visortech:~/$ git clone https://github.com/chelule/incubator-superset.git
+xxxxxxx@ubuntu-visortech:~/incubator-superset$ cd incubator-superset
+xxxxxxx@ubuntu-visortech:~/incubator-superset$ NPM_BUILD_CMD=build sudo docker build -f Dockerfile-visortech -t visortech_superset_0.37.2-chelule .
+```
+```shell
+xxxxxxx@ubuntu-visortech:~/$ sudo docker-compose up -d --build superset_new && docker-compose logs -f superset_new
+```

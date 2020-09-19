@@ -1,0 +1,99 @@
+# Apache Druid
+
+## What is Apache Druid
+
+Apache Druid is a real-time analytics database designed for fast slice-and-dice analytics ("OLAP" queries) on large data sets. Druid is most often used as a database for powering use cases where real-time ingest, fast query performance, and high uptime are important. As such, Druid is commonly used for powering GUIs of analytical applications, or as a backend for highly-concurrent APIs that need fast aggregations. Druid works best with event-oriented data.
+
+Druid's core architecture combines ideas from data warehouses, timeseries databases, and logsearch systems.
+
+### Common application areas for Druid
+
+1. Clickstream analytics (web and mobile analytics)
+2. Network telemetry analytics (network performance monitoring)
+3. Server metrics storage
+4. Supply chain analytics (manufacturing metrics)
+5. Application performance metrics
+6. Digital marketing/advertising analytics
+7. Business intelligence / OLAP
+
+## How to setup apache druid
+
+### Requirements
+You can follow these steps on a relatively small machine, such as a laptop with around `4 CPU` and `16 GB of RAM`.
+
+Druid comes with several startup configuration profiles for a range of machine sizes. The micro-quickstartconfiguration profile shown here is suitable for evaluating Druid. If you want to try out Druid's performance or scaling capabilities, you'll need a larger machine and configuration profile.
+
+The configuration profiles included with Druid range from the even smaller `Nano-Quickstart` configuration (`1 CPU`, `4GB RAM`) to the X-Large configuration (`64 CPU`, `512GB RAM`). For more information, see Single server deployment. Alternatively, see Clustered deployment for information on deploying Druid services across clustered machines.
+
+The software requirements for the installation machine are:
+
+Linux, Mac OS X, or other Unix-like OS (Windows is not supported)
+Java 8, Update 92 or later (8u92+)
+
+<aside class="warning">
+Druid officially supports Java 8 only. Support for later major versions of Java is currently in experimental status.
+</aside>
+
+<aside class="notice">
+Druid relies on the environment variables `JAVA_HOME` or `DRUID_JAVA_HOME` to find Java on the machine. You can set `DRUID_JAVA_HOME` if there is more than one instance of Java. To verify Java requirements for your environment, run the `bin/verify-java` script.
+</aside>
+
+Before installing a production Druid instance, be sure to consider the user account on the operating system under which Druid will run. This is important because any Druid console user will have, effectively, the same permissions as that user. So, for example, the file browser UI will show console users the files that the underlying user can access. In general, avoid running Druid as root user. Consider creating a dedicated user account for running Druid.
+
+### Getting Started
+
+```shell
+xxxxxxx@ubuntu-visortech:~/apache-druid$ curl -o apache-druid https://www.apache.org/dyn/closer.cgi?path=/druid/0.19.0/apache-druid-0.19.0-bin.tar.gz
+xxxxxxx@ubuntu-visortech:~/apache-druid$ tar -xzf apache-druid
+xxxxxxx@ubuntu-visortech:~/apache-druid$ cd apache-druid
+xxxxxxx@ubuntu-visortech:~/apache-druid$ ls
+
+xxxxxxx@ubuntu-visortech:~/apache-druid$ ls -la /opt/druid/apache-druid-0.18.1/
+total 868
+drwxrwxrwx 11 root   root     4096 Aug  9 22:26 .
+drwxrwxrwx 30 root   root     4096 Jun 14 19:06 ..
+-rwxrwxrwx  1    501 staff   62704 May  5 21:58 LICENSE
+-rwxrwxrwx  1    501 staff   69239 May  5 21:58 NOTICE
+-rwxrwxrwx  1    501 staff    8228 May  5 22:02 README
+drwxrwxrwx  2 root   root     4096 Jun  9 15:52 bin
+drwxrwxrwx  5 root   root     4096 Jun  9 15:52 conf
+drwxrwxrwx 26 root   root     4096 Jun  9 15:52 extensions
+drwxrwxrwx  3 root   root     4096 Jun  9 15:52 hadoop-dependencies
+drwxrwxrwx  2 root   root    12288 Jun  9 15:52 lib
+drwxrwxrwx  4    501 staff    4096 May  5 21:34 licenses
+drwxrwxr-x  2 victor xxxxxx   4096 Jun 16 09:54 log
+drwxrwxrwx  4 root   root     4096 Jun  9 15:52 quickstart
+drwxrwxrwx  6 root   root     4096 Jun  9 15:53 var
+
+xxxxxxx@ubuntu-visortech:~/apache-druid$ ./bin/start-micro-quickstart
+[Fri May  3 11:40:50 2019] Running command[zk], logging to[/apache-druid-0.19.0/var/sv/zk.log]: bin/run-zk conf
+[Fri May  3 11:40:50 2019] Running command[coordinator-overlord], logging to[/apache-druid-0.19.0/var/sv/coordinator-overlord.log]: bin/run-druid coordinator-overlord conf/druid/single-server/micro-quickstart
+[Fri May  3 11:40:50 2019] Running command[broker], logging to[/apache-druid-0.19.0/var/sv/broker.log]: bin/run-druid broker conf/druid/single-server/micro-quickstart
+[Fri May  3 11:40:50 2019] Running command[router], logging to[/apache-druid-0.19.0/var/sv/router.log]: bin/run-druid router conf/druid/single-server/micro-quickstart
+[Fri May  3 11:40:50 2019] Running command[historical], logging to[/apache-druid-0.19.0/var/sv/historical.log]: bin/run-druid historical conf/druid/single-server/micro-quickstart
+[Fri May  3 11:40:50 2019] Running command[middleManager], logging to[/apache-druid-0.19.0/var/sv/middleManager.log]: bin/run-druid middleManager conf/druid/single-server/micro-quickstart
+```
+
+1. Download the [0.19.0 release](https://www.apache.org/dyn/closer.cgi?path=/druid/0.19.0/apache-druid-0.19.0-bin.tar.gz).
+
+### How to start up Druid services
+
+After downloading druid, start up Druid services using the micro-quickstart single-machine configuration.
+This should bring up:
+
+1. Zookeeper
+2. Druid Services
+
+All persistent state, such as the cluster metadata store and segments for the services, are kept in the `var` directory under the Druid root directory, `apache-druid-0.19.0`. Each service writes to a log file under `var/sv`, as noted in the startup script output above.
+
+At any time, you can revert Druid to its original, post-installation state by deleting the entire var directory. You may want to do this, for example, between Druid tutorials or after experimentation, to start with a fresh instance.
+
+To stop Druid at any time, use `CTRL-C` in the terminal. This exits the bin/start-micro-quickstart script and terminates all Druid processes.
+
+## How to open Driud console
+
+After the Druid services finish startup, open the [Druid console](http://localhost:8888)
+
+It may take a few seconds for all Druid services to finish starting, including the Druid router, which serves the console. If you attempt to open the Druid console before startup is complete, you may see errors in the browser. Wait a few moments and try again.
+
+<%= image_tag "images/apache-druid-console.png" %>

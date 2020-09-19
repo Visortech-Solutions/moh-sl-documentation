@@ -1,0 +1,113 @@
+# Apache NiFi
+
+> An easy to use, powerful, and reliable system to process and distribute data. Apache NiFi supports powerful and scalable directed graphs of data routing, transformation, and system mediation logic. Some of the high-level capabilities and objectives of Apache NiFi include:
+
+1. Web-based user interface
+    - Seamless experience between design, control, feedback, and monitoring
+2. Highly configurable
+    - Loss tolerant vs guaranteed delivery
+    - Low latency vs high throughput
+    - Dynamic prioritization
+    - Flow can be modified at runtime
+    - Back pressure
+3. Data Provenance
+    - Track dataflow from beginning to end
+4. Designed for extension
+    - Build your own processors and more
+    - Enables rapid development and effective testing
+5. Secure
+    - SSL, SSH, HTTPS, encrypted content, etc...
+    - Multi-tenant authorization and internal authorization/policy management
+
+<%= image_tag "images/apache-nifi.png" %>
+
+## What is Apache NiFi
+
+Put simply, NiFi was built to automate the flow of data between systems. While the term 'dataflow' is used in a variety of contexts, we use it here to mean the automated and managed flow of information between systems. This problem space has been around ever since enterprises had more than one system, where some of the systems created data and some of the systems consumed data. The problems and solution patterns that emerged have been discussed and articulated extensively. A comprehensive and readily consumed form is found in the Enterprise Integration Patterns [eip].
+
+## Getting started with NiFi
+
+Apache NiFi can run on something as simple as a laptop, but it can also be clustered across many enterprise-class servers. Therefore, the amount of hardware and memory needed will depend on the size and nature of the dataflow involved. The data is stored on disk while NiFi is processing it. So NiFi needs to have sufficient disk space allocated for its various repositories, particularly the content repository, flowfile repository, and provenance repository (see the System Properties section for more information about these repositories). NiFi has the following minimum system requirements:
+
+1. Requires Java 8 or Java 11
+2. Supported Operating Systems: `Linux` `Unix` `Windows` `Mac OS X`
+3. Supported Web Browsers: `Microsoft Edge: Current & (Current - 1)` `Mozilla FireFox: Current & (Current - 1)` `Google Chrome: Current & (Current - 1)` `Safari: Current & (Current - 1)`
+
+NiFi can be downloaded from the NiFi Downloads page. There are two packaging options available:
+
+- a **tarball (tar.gz)** that is tailored more to _Linux_
+
+- a **zip file** that is more applicable for _Windows_ users
+
+## How to install
+
+### Linux/Unix/OS X
+
+1. Decompress and untar into desired installation directory
+
+2. Make any desired edits in files found under `<installdir>/conf`
+
+3. At a minimum, we recommend editing the `nifi.properties` file and entering a password for `the nifi.sensitive.props.key` (see System Properties below)
+
+4. From the `<installdir>/bin` directory, execute the following commands by typing `./nifi.sh <command>`:
+
+    - `start`: starts NiFi in the background
+
+    - `stop`: stops NiFi that is running in the background
+
+    - `status`: provides the current status of NiFi
+
+    - `run`: runs NiFi in the foreground and waits for a Ctrl-C to initiate shutdown of NiFi
+
+    - `install`: installs NiFi as a service that can then be controlled via
+
+        1. `service nifi start`
+
+        2. `service nifi stop`
+
+        3. `service nifi status`
+
+## Port Configuration
+
+Function | Property | Port
+--------- | -------- | -----
+HTTP Port | nifi.web.http.port | 8080
+HTTPS Port* | nifi.web.https.port | 9443
+Remote Input Socket Port* | nifi.remote.input.socket.port | 10443
+Cluster Node Protocol Port* | nifi.remote.input.socket.port | 11443
+Cluster Node Load Balancing Port | nifi.cluster.node.load.balance.port | 6342
+Web HTTP Forwarding Port | nifi.web.http.port.forwarding | n/a
+
+### Embedded Zookeeper
+
+Function | Property | Port
+--------- | -------- | -----
+Zookeeper Client Port (Deprecated: client port is no longer specified on a separate line as of NiFi 1.10.x) | clientPort | 2181
+Zookeeper Server Quorum and Leader Election Ports | server.1 | n/a
+
+<aside class="notice">
+Commented examples for the Zookeeper server ports are included in the zookeeper.properties file in the form server.N=nifi-nodeN-hostname:2888:3888;2181.
+</aside>
+
+<%= image_tag "images/nifi-console.png" %>
+
+
+## Adding a Processor
+
+<%= image_tag "images/nifi-add-processor.png" %>
+
+We can now begin creating our dataflow by adding a Processor to our canvas. To do this, drag the Processor icon from the top-left of the screen into the middle of the canvas _the graph paper-like background_ and drop it there. This will give us a dialog that allows us to choose which Processor we want to add:
+
+We have quite a few options to choose from. For the sake of becoming oriented with the system, let’s say that we just want to bring in files from our local disk into NiFi. When a developer creates a Processor, the developer can assign _tags_ to that Processor. These can be thought of as keywords. We can filter by these tags or by Processor name by typing into the Filter box in the top-right corner of the dialog. Type in the keywords that you would think of when wanting to ingest files from a local disk. Typing in keyword _file_, for instance, will provide us a few different Processors that deal with files. Filtering by the term _local_ will narrow down the list pretty quickly, as well. If we select a Processor from the list, we will see a brief description of the Processor near the bottom of the dialog. This should tell us exactly what the Processor does. The description of the **GetFile** Processor tells us that it pulls data from our local disk into NiFi and then removes the local file. We can then _double-click_ the Processor type or select it and choose the **Add** button. The Processor will be added to the canvas in the location that it was dropped.
+
+## Configuring a Processor
+
+Now that we have added the **GetFile** Processor, we can configure it by right-clicking on the Processor and choosing the Configure menu item. The provided dialog allows us to configure many different options that can be read about in the [User Guide](https://nifi.apache.org/docs/nifi-docs/html/user-guide.html), but for the sake of this guide, we will focus on the Properties tab. Once the Properties tab has been selected, we are given a list of several different properties that we can configure for the Processor. The properties that are available depend on the type of Processor and are generally different for each type. Properties that are in bold are required properties. The Processor cannot be started until all required properties have been configured. The most important property to configure for **GetFile** is the directory from which to pick up files. If we set the directory name to `./data-in`, this will cause the Processor to start picking up any data in the `data-in` subdirectory of the NiFi Home directory. We can choose to configure several different Properties for this Processor. If unsure what a particular Property does, we can hover over the Help icon next to the Property Name with the mouse in order to read a description of the property. Additionally, the tooltip that is displayed when hovering over the Help icon will provide the default value for that property, if one exists, information about whether or not the property supports the Expression Language (see the [Expression Language / Using Attributes in Property Values](https://nifi.apache.org/docs/nifi-docs/html/getting-started.html#ExpressionLanguage) section below), and previously configured values for that property.
+
+In order for this property to be valid, create a directory named `data-in` in the NiFi home directory and then click the **Ok** button to close the dialog.
+
+In order for this property to be valid, create a directory named data-in in the NiFi home directory and then click the Ok button to close the dialog.
+
+## Processors Available 
+
+<%= image_tag "images/nifi-processes.png" %>
